@@ -30,10 +30,15 @@ export function AddItemForm({ onAdd, suggestions = [] }: AddItemFormProps) {
   const [categoria, setCategoria] = useState("outros");
   const [preco, setPreco] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(-1);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   const { suggestions: autocomplete, showSuggestions, loadingRemote } =
     useProductSearch(nome, suggestions);
+
+  const showPicker =
+    pickerOpen && showSuggestions && autocomplete.length > 0;
 
   useEffect(() => {
     setHighlightIndex(-1);
@@ -46,6 +51,7 @@ export function AddItemForm({ onAdd, suggestions = [] }: AddItemFormProps) {
     setCategoria("outros");
     setPreco("");
     setHighlightIndex(-1);
+    setPickerOpen(false);
   }
 
   function submitItem() {
@@ -73,6 +79,7 @@ export function AddItemForm({ onAdd, suggestions = [] }: AddItemFormProps) {
     setCategoria(item.categoria);
     setUnidade(item.unidade);
     setHighlightIndex(-1);
+    setPickerOpen(false);
     inputRef.current?.focus();
   }
 
@@ -87,7 +94,7 @@ export function AddItemForm({ onAdd, suggestions = [] }: AddItemFormProps) {
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (!showSuggestions || autocomplete.length === 0) return;
+    if (!showPicker || autocomplete.length === 0) return;
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -118,20 +125,25 @@ export function AddItemForm({ onAdd, suggestions = [] }: AddItemFormProps) {
 
       <Modal open={open} onClose={() => setOpen(false)} title="Adicionar item">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="relative">
+          <div ref={anchorRef} className="relative">
             <Input
               label="Nome do item"
               placeholder="Ex: Leite integral"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
+              onFocus={() => setPickerOpen(true)}
+              onBlur={() => {
+                window.setTimeout(() => setPickerOpen(false), 150);
+              }}
               onKeyDown={handleKeyDown}
               ref={inputRef}
               autoFocus
               autoComplete="off"
             />
             <ProductAutocomplete
+              anchorRef={anchorRef}
               suggestions={autocomplete}
-              visible={showSuggestions}
+              visible={showPicker}
               loading={loadingRemote}
               onSelect={selectSuggestion}
               highlightIndex={highlightIndex}

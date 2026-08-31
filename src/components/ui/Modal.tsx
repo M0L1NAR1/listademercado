@@ -22,7 +22,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
       />
       <div
         className={cn(
-          "relative z-10 w-full max-w-[430px] animate-slide-up rounded-t-[1.5rem] bg-surface p-6 shadow-2xl",
+          "relative z-10 w-full max-w-[430px] animate-slide-up overflow-visible rounded-t-[1.5rem] bg-surface p-6 shadow-2xl",
           "pb-[calc(1.5rem+env(safe-area-inset-bottom))]",
           className
         )}

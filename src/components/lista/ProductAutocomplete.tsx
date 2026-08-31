@@ -1,11 +1,14 @@
 "use client";
 
+import { useEffect, useState, type RefObject } from "react";
+import { createPortal } from "react-dom";
 import { History, Globe, ShoppingBasket } from "lucide-react";
 import { getCategoria } from "@/lib/categories";
 import type { ProductSuggestion } from "@/lib/product-types";
 import { cn } from "@/lib/utils";
 
 type ProductAutocompleteProps = {
+  anchorRef: RefObject<HTMLElement | null>;
   suggestions: ProductSuggestion[];
   visible: boolean;
   loading?: boolean;
@@ -20,16 +23,63 @@ const SOURCE_LABEL = {
 } as const;
 
 export function ProductAutocomplete({
+  anchorRef,
   suggestions,
   visible,
   loading,
   onSelect,
   highlightIndex = -1,
 }: ProductAutocompleteProps) {
-  if (!visible) return null;
+  const [mounted, setMounted] = useState(false);
+  const [position, setPosition] = useState<{
+    top: number;
+    left: number;
+    width: number;
+  } | null>(null);
 
-  return (
-    <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-56 overflow-y-auto rounded-[var(--radius-btn)] border border-border bg-surface shadow-[var(--shadow-card)]">
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!visible || !anchorRef.current) {
+      setPosition(null);
+      return;
+    }
+
+    const updatePosition = () => {
+      const anchor = anchorRef.current;
+      if (!anchor) return;
+
+      const rect = anchor.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+      });
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [visible, anchorRef, suggestions.length]);
+
+  if (!mounted || !visible || !position) return null;
+
+  return createPortal(
+    <div
+      className="fixed z-[9999] max-h-56 overflow-y-auto rounded-[var(--radius-btn)] border border-border bg-surface shadow-[var(--shadow-card)]"
+      style={{
+        top: position.top,
+        left: position.left,
+        width: position.width,
+      }}
+    >
       {suggestions.map((item, index) => {
         const cat = getCategoria(item.categoria);
         const meta = SOURCE_LABEL[item.source];
@@ -39,6 +89,7 @@ export function ProductAutocomplete({
           <button
             key={`${item.source}-${item.nome}-${index}`}
             type="button"
+            onPointerDown={(e) => e.preventDefault()}
             onClick={() => onSelect(item)}
             className={cn(
               "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors",
@@ -67,6 +118,7 @@ export function ProductAutocomplete({
           Buscando mais produtos...
         </p>
       )}
-    </div>
+    </div>,
+    document.body
   );
 }
