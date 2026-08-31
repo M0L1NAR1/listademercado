@@ -16,13 +16,17 @@ export async function GET() {
       if (data) return NextResponse.json(data);
     }
 
-    const { data: existing } = await admin
+    const { data: existing, error: selectError } = await admin
       .from("households")
       .select("*")
-      .limit(1)
-      .maybeSingle();
+      .order("created_at", { ascending: true })
+      .limit(1);
 
-    if (existing) return NextResponse.json(existing);
+    if (selectError) {
+      return NextResponse.json({ error: selectError.message }, { status: 500 });
+    }
+
+    if (existing?.[0]) return NextResponse.json(existing[0]);
 
     const { data: created, error } = await admin
       .from("households")
@@ -35,6 +39,17 @@ export async function GET() {
       .single();
 
     if (error) {
+      // Concorrência: outra requisição criou a casa primeiro
+      if (error.code === "23505") {
+        const { data: retry } = await admin
+          .from("households")
+          .select("*")
+          .order("created_at", { ascending: true })
+          .limit(1);
+
+        if (retry?.[0]) return NextResponse.json(retry[0]);
+      }
+
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
