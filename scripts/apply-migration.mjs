@@ -15,10 +15,11 @@ const databaseUrl = process.env.DATABASE_URL;
 const dbPassword = process.env.SUPABASE_DB_PASSWORD;
 const projectRef = url?.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1];
 
-const migrationFiles = [
-  "001_initial_schema.sql",
-  "002_no_auth_open_access.sql",
-];
+  const migrationFiles = [
+    "001_initial_schema.sql",
+    "002_no_auth_open_access.sql",
+    "003_stock_items.sql",
+  ];
 
 function buildDatabaseUrl() {
   if (databaseUrl) return databaseUrl;

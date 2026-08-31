@@ -59,6 +59,17 @@ export type ItemTemplate = {
   ultima_compra: string | null;
 };
 
+export type StockItem = {
+  id: string;
+  household_id: string;
+  nome: string;
+  quantidade: number;
+  unidade: string;
+  categoria: string;
+  updated_at: string;
+  created_at: string;
+};
+
 export type MonthlyComparison = {
   mesAtual: string;
   mesAnterior: string;

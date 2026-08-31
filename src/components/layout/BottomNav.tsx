@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShoppingCart, BarChart3, History, User } from "lucide-react";
+import { ShoppingCart, Package, BarChart3, History, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/lista", label: "Lista", icon: ShoppingCart },
+  { href: "/estoque", label: "Estoque", icon: Package },
   { href: "/historico", label: "Histórico", icon: History },
   { href: "/comparativo", label: "Comparativo", icon: BarChart3 },
   { href: "/perfil", label: "Sobre", icon: User },

@@ -33,6 +33,7 @@ export async function POST(request: Request) {
   const migrationFiles = [
     "001_initial_schema.sql",
     "002_no_auth_open_access.sql",
+    "003_stock_items.sql",
   ];
 
   const db = postgres(databaseUrl, { max: 1, ssl: "require" });

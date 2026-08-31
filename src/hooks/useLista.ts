@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getHousehold, getActiveList } from "@/lib/household";
+import { addToStock, removeFromStock } from "@/lib/stock";
 import type { Household, ListItem, ItemTemplate, ShoppingList } from "@/lib/types";
 
 export function useLista() {
@@ -109,16 +110,31 @@ export function useLista() {
 
   async function toggleItem(id: string) {
     const item = items.find((i) => i.id === id);
-    if (!item) return;
+    if (!item || !household) return;
 
     const supabase = createClient();
+    const nextComprado = !item.comprado;
+
     await supabase
       .from("list_items")
       .update({
-        comprado: !item.comprado,
-        comprado_em: !item.comprado ? new Date().toISOString() : null,
+        comprado: nextComprado,
+        comprado_em: nextComprado ? new Date().toISOString() : null,
       })
       .eq("id", id);
+
+    const stockItem = {
+      nome: item.nome,
+      quantidade: Number(item.quantidade),
+      unidade: item.unidade,
+      categoria: item.categoria,
+    };
+
+    if (nextComprado) {
+      await addToStock(supabase, household.id, stockItem);
+    } else {
+      await removeFromStock(supabase, household.id, stockItem);
+    }
   }
 
   async function updatePrice(id: string, price: number) {
@@ -138,7 +154,20 @@ export function useLista() {
   }
 
   async function deleteItem(id: string) {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+
     const supabase = createClient();
+
+    if (item.comprado && household) {
+      await removeFromStock(supabase, household.id, {
+        nome: item.nome,
+        quantidade: Number(item.quantidade),
+        unidade: item.unidade,
+        categoria: item.categoria,
+      });
+    }
+
     await supabase.from("list_items").delete().eq("id", id);
   }
 
