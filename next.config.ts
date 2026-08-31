@@ -1,9 +1,16 @@
 import type { NextConfig } from "next";
-import path from "path";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  outputFileTracingRoot: path.join(process.cwd()),
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/lista",
+        permanent: false,
+      },
+    ];
+  },
   headers: async () => [
     {
       source: "/(.*)",
