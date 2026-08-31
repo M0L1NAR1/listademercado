@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-brand-50: #f0fdf4;
+  --color-brand-100: #dcfce7;
+  --color-brand-200: #bbf7d0;
+  --color-brand-300: #86efac;
+  --color-brand-400: #4ade80;
+  --color-brand-500: #22c55e;
+  --color-brand-600: #16a34a;
+  --color-brand-700: #15803d;
+  --color-brand-800: #166534;
+  --color-brand-900: #14532d;
+  --color-surface: #ffffff;
+  --color-surface-2: #f8faf9;
+  --color-surface-3: #f1f5f3;
+  --color-text: #0f1a14;
+  --color-text-muted: #5c6b62;
+  --color-border: #e2ebe6;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --radius-card: 1.25rem;
+  --radius-btn: 0.875rem;
+  --shadow-card: 0 4px 24px -4px rgb(15 26 20 / 0.08);
+  --shadow-float: 0 8px 32px -8px rgb(22 163 74 / 0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-surface: #0d1410;
+    --color-surface-2: #141c17;
+    --color-surface-3: #1a2420;
+    --color-text: #eef5f0;
+    --color-text-muted: #8fa396;
+    --color-border: #243029;
+    --shadow-card: 0 4px 24px -4px rgb(0 0 0 / 0.4);
+    --shadow-float: 0 8px 32px -8px rgb(0 0 0 / 0.5);
+  }
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  min-height: 100dvh;
+  overscroll-behavior: none;
+}
+
+.app-shell {
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  background: var(--color-surface-2);
+  position: relative;
+}
+
+.safe-bottom {
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes check-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.35s ease-out both;
+}
+
+.animate-check {
+  animation: check-pop 0.25s ease-out;
+}
+
+input, button, textarea, select {
+  font-family: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
