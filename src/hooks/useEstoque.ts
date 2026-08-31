@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getHousehold, getActiveList } from "@/lib/household";
+import { normalizeItemName } from "@/lib/utils";
 import type { StockItem, Household } from "@/lib/types";
 
 export function useEstoque() {
@@ -150,26 +151,53 @@ export function useEstoque() {
       const toSend = items.filter((i) => selected.has(i.id));
       const { data: existingItems } = await supabase
         .from("list_items")
-        .select("nome")
+        .select("id, nome, comprado")
         .eq("list_id", activeList.id);
 
-      const existingNames = new Set(
-        (existingItems ?? []).map((i) => i.nome.toLowerCase())
-      );
+      const onList = existingItems ?? [];
+      const toInsert: {
+        list_id: string;
+        nome: string;
+        quantidade: number;
+        unidade: string;
+        categoria: string;
+        ordem: number;
+      }[] = [];
 
-      const newItems = toSend
-        .filter((i) => !existingNames.has(i.nome.toLowerCase()))
-        .map((item, index) => ({
+      for (const stockItem of toSend) {
+        const key = normalizeItemName(stockItem.nome);
+        const existing = onList.find(
+          (i) => normalizeItemName(i.nome) === key
+        );
+
+        if (existing) {
+          if (existing.comprado) {
+            await supabase
+              .from("list_items")
+              .update({
+                comprado: false,
+                comprado_em: null,
+                quantidade: 1,
+                unidade: stockItem.unidade,
+                categoria: stockItem.categoria,
+              })
+              .eq("id", existing.id);
+          }
+          continue;
+        }
+
+        toInsert.push({
           list_id: activeList.id,
-          nome: item.nome,
+          nome: stockItem.nome,
           quantidade: 1,
-          unidade: item.unidade,
-          categoria: item.categoria,
-          ordem: index,
-        }));
+          unidade: stockItem.unidade,
+          categoria: stockItem.categoria,
+          ordem: toInsert.length,
+        });
+      }
 
-      if (newItems.length > 0) {
-        await supabase.from("list_items").insert(newItems);
+      if (toInsert.length > 0) {
+        await supabase.from("list_items").insert(toInsert);
       }
 
       clearSelection();

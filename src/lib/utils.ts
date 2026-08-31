@@ -34,7 +34,11 @@ export function generateInviteCode(): string {
 }
 
 export function normalizeItemName(name: string): string {
-  return name.trim().toLowerCase();
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
 }
 
 export function parseCurrencyInput(value: string): number | null {

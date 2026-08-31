@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { normalizeItemName } from "@/lib/utils";
 
 type StockInput = {
   nome: string;
@@ -16,7 +17,7 @@ export async function addToStock(
     .from("stock_items")
     .select("id, quantidade")
     .eq("household_id", householdId)
-    .ilike("nome", item.nome)
+    .eq("nome_lower", normalizeItemName(item.nome))
     .maybeSingle();
 
   if (existing) {
@@ -50,7 +51,7 @@ export async function removeFromStock(
     .from("stock_items")
     .select("id, quantidade")
     .eq("household_id", householdId)
-    .ilike("nome", item.nome)
+    .eq("nome_lower", normalizeItemName(item.nome))
     .maybeSingle();
 
   if (!existing) return;
