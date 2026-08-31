@@ -128,6 +128,16 @@ export function useEstoque() {
     await updateQty(id, 0);
   }
 
+  async function deleteItem(id: string) {
+    const supabase = createClient();
+    await supabase.from("stock_items").delete().eq("id", id);
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  }
+
   async function sendToList() {
     if (!household || selected.size === 0) return;
 
@@ -184,6 +194,7 @@ export function useEstoque() {
     clearSelection,
     updateQty,
     markAcabou,
+    deleteItem,
     sendToList,
     reload: load,
   };

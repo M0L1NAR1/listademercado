@@ -8,6 +8,7 @@ import { StockCard } from "@/components/estoque/StockCard";
 import { useEstoque } from "@/hooks/useEstoque";
 
 export default function EstoquePage() {
+  const router = useRouter();
   const {
     household,
     items,
@@ -21,8 +22,14 @@ export default function EstoquePage() {
     clearSelection,
     updateQty,
     markAcabou,
+    deleteItem,
     sendToList,
   } = useEstoque();
+
+  async function handleSendToList() {
+    await sendToList();
+    router.push("/lista");
+  }
 
   if (loading) {
     return (
@@ -71,6 +78,7 @@ export default function EstoquePage() {
                       onToggleSelect={toggleSelect}
                       onUpdateQty={updateQty}
                       onMarkAcabou={markAcabou}
+                      onDelete={deleteItem}
                     />
                   ))}
                 </div>
@@ -92,6 +100,7 @@ export default function EstoquePage() {
                       onToggleSelect={toggleSelect}
                       onUpdateQty={updateQty}
                       onMarkAcabou={markAcabou}
+                      onDelete={deleteItem}
                     />
                   ))}
                 </div>
@@ -114,7 +123,7 @@ export default function EstoquePage() {
             <Button
               fullWidth
               size="lg"
-              onClick={sendToList}
+              onClick={handleSendToList}
               disabled={sending}
             >
               <ShoppingCart size={18} className="mr-2" />

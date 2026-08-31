@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Minus, Plus } from "lucide-react";
+import { DeleteButton } from "@/components/ui/DeleteButton";
 import { getCategoria } from "@/lib/categories";
 import { formatCurrency, cn } from "@/lib/utils";
 import type { ListItem } from "@/lib/types";
@@ -101,12 +102,10 @@ export function ItemCard({
           </div>
         </div>
 
-        <button
-          onClick={() => onDelete(item.id)}
-          className="shrink-0 text-xs text-text-muted/60 hover:text-danger"
-        >
-          ✕
-        </button>
+        <DeleteButton
+          itemName={item.nome}
+          onConfirm={() => onDelete(item.id)}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Minus, Plus } from "lucide-react";
+import { DeleteButton } from "@/components/ui/DeleteButton";
 import { getCategoria } from "@/lib/categories";
 import { cn } from "@/lib/utils";
 import type { StockItem } from "@/lib/types";
@@ -12,6 +13,7 @@ type StockCardProps = {
   onToggleSelect?: (id: string) => void;
   onUpdateQty: (id: string, qty: number) => void;
   onMarkAcabou: (id: string) => void;
+  onDelete: (id: string) => void;
 };
 
 export function StockCard({
@@ -21,6 +23,7 @@ export function StockCard({
   onToggleSelect,
   onUpdateQty,
   onMarkAcabou,
+  onDelete,
 }: StockCardProps) {
   const cat = getCategoria(item.categoria);
   const qty = Number(item.quantidade);
@@ -95,6 +98,11 @@ export function StockCard({
             )}
           </div>
         </div>
+
+        <DeleteButton
+          itemName={item.nome}
+          onConfirm={() => onDelete(item.id)}
+        />
       </div>
     </div>
   );
